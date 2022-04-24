@@ -13,7 +13,6 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
-
 config :hello_elixir, HelloElixir.Repo,
   # username: "postgres",
   # password: "postgres",
