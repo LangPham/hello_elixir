@@ -6,54 +6,57 @@ on:
   pull_request:
     branches: [ master ]
 
-# permissions:
-#   contents: read
+permissions:
+  contents: read
 
 jobs:
-  # label of the container job
-  postgres-job:
-    # containers must run in Linux based operating systems
-    runs-on: ubuntu-latest
-    # Docker Hub image that `postgres-job` executes in
-    container: node:latest
+  build:
 
-    # service containers to run with `postgres-job`
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    # Service containers to run with `container-job`
     services:
-      # label used to access the service container
+      # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres:latest
-        # service environment variables
-        # `POSTGRES_HOST` is `postgres`
+        image: postgres
+        # Provide the password for postgres
         env:
-          # optional (defaults to `postgres`)
-          POSTGRES_DB: postgres_db
-          # required
-          POSTGRES_PASSWORD: postgres_password
-          # optional (defaults to `5432`)
-          POSTGRES_PORT: 5432
-          # optional (defaults to `postgres`)
-          POSTGRES_USER: postgres_user
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
         ports:
-          # maps tcp port 5432 on service container to the host
-          - 5432:5432
-        # set health checks to wait until postgres has started
+          # Opens tcp port 6379 on the host and service container
+          - 5432:5432  
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+       
 
     steps:
-      - name: Install PostgreSQL client
-        run: |
-          apt-get update
-          apt-get install --yes postgresql-client
-
-      # queries database with postgres client
-      - name: Query database
-        run: psql -h postgres -d postgres_db -U postgres_user -c 'SELECT 1;'
-        env:
-          # postgress password is required; alternatively, you can run:
-          # `PGPASSWORD=postgres_password psql ...`
-          PGPASSWORD: postgres_password
+      # - uses: actions/checkout@v3
+      - name: Test connect 
+        run: ping -c 4 postgres
+    # - name: Set up Elixir
+    #   uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
+    #   with:
+    #     elixir-version: '1.12.3' # Define the elixir version [required]
+    #     otp-version: '24.1' # Define the OTP version [required]
+    # - name: Restore dependencies cache
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: deps
+    #     key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+    #     restore-keys: ${{ runner.os }}-mix-
+    # - name: Install dependencies
+    #   run: mix deps.get
+    # - name: Run tests
+    #   run: mix test
+      # # Environment variables used by the `client.js` script to create a new PostgreSQL table.
+      #   env:
+      #     # The hostname used to communicate with the PostgreSQL service container
+      #     POSTGRES_HOST: postgres
+      #     # The default PostgreSQL port
+      #     POSTGRES_PORT: 5432
