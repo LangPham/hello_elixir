@@ -6,20 +6,20 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 
-# database_url =
-#   System.get_env("DATABASE_URL") ||
-#     raise """
-#     environment variable DATABASE_URL is missing.
-#     For example: ecto://USER:PASS@HOST/DATABASE
-#     """
+database_url =
+  System.get_env("DATABASE_URL") ||
+    raise """
+    environment variable DATABASE_URL is missing.
+    For example: ecto://USER:PASS@HOST/DATABASE
+    """
 
 
 config :hello_elixir, HelloElixir.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "postgres",
-  database: "hello_elixir_test#{System.get_env("MIX_TEST_PARTITION")}",
-  # url: database_url,
+  # username: "postgres",
+  # password: "postgres",
+  # hostname: "postgres",
+  # database: "hello_elixir_test#{System.get_env("MIX_TEST_PARTITION")}",
+  url: database_url,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
