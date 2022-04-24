@@ -23,7 +23,14 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
+          # optional (defaults to `postgres`)
+          POSTGRES_DB: postgres
+          # required
           POSTGRES_PASSWORD: postgres
+          # optional (defaults to `5432`)
+          POSTGRES_PORT: 5432
+          # optional (defaults to `postgres`)
+          POSTGRES_USER: postgres
         # Set health checks to wait until postgres has started
         ports:
           # Opens tcp port 6379 on the host and service container
@@ -37,8 +44,18 @@ jobs:
 
     steps:
       # - uses: actions/checkout@v3
-      - name: Test connect 
-        run: ping -c 4 postgres
+      - name: Install PostgreSQL client
+        run: |
+          apt-get update
+          apt-get install --yes postgresql-client
+  
+      # queries database with postgres client
+      - name: Query database
+        run: psql -h postgres -d postgres -U postgres -c 'SELECT 1;'
+        env:
+          # postgress password is required; alternatively, you can run:
+          # `PGPASSWORD=postgres_password psql ...`
+          PGPASSWORD: postgres
     # - name: Set up Elixir
     #   uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
     #   with:
